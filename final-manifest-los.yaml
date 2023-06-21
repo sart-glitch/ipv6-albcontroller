@@ -1,0 +1,86 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: IPV6-sarthak
+  region: ap-south-1
+  version: "1.25"
+kubernetesNetworkConfig:
+  ipFamily: IPv6
+
+ 
+vpc:
+  id: "vpc-052691ab2d8d03102"
+  subnets:
+    public:
+      LOS-final-test-subnet-public1-ap-south-1a:
+        id: "subnet-0a25e2b566823e6c8"
+        region: "ap-south-1a"
+      LOS-final-test-subnet-public2-ap-south-1b:
+        id: "subnet-058b70165bec6d408"
+        region: "ap-south-1b"
+      LOS-final-test-subnet-public3-ap-south-1c:
+        id: "subnet-0889c3575784a6f59"
+        region: "ap-south-1c"
+    private:
+      LOS-final-test-subnet-private1-ap-south-1a:
+        id: "subnet-0a51a18e349dead8f"
+        region: "ap-south-1a"
+      LOS-final-test-subnet-private2-ap-south-1b:
+        id: "subnet-09d292cc753f86819"
+        region: "ap-south-1b"
+      LOS-final-test-subnet-private3-ap-south-1c:
+        id: "subnet-0cad0fe40705d912d"
+        region: "ap-south-1c"
+
+addons: 
+  - name: vpc-cni 
+    version: latest 
+  - name: coredns 
+    version: latest 
+  - name: kube-proxy
+    version: latest
+
+managedNodeGroups:
+  - name: Final-test-NG1
+    ami: ami-0e7cc72c8f0061795
+    amiFamily: AmazonLinux2
+    overrideBootstrapCommand: |
+      #!/bin/bash
+      /etc/eks/bootstrap.sh IPV6-sarthak --container-runtime containerd
+    minSize: 1
+    maxSize: 2
+    desiredCapacity: 1
+    instanceType: "t3a.medium"
+    volumeSize: 20
+    privateNetworking: true
+    subnets:
+      - LOS-final-test-subnet-private1-ap-south-1a
+      - LOS-final-test-subnet-private2-ap-south-1b
+      - LOS-final-test-subnet-private3-ap-south-1c
+    labels: {role: IPV6-NG-1}
+    tags:
+      nodegroup-role: IPV6-NG-1
+      nodegroup-name: IPV6-NG-1
+      Project: IPV6
+      Env: Dev-Stag
+      Layer: App
+      Managedby: Sarthusofts
+    iam:
+      attachPolicyARNs:
+        - arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy
+        - arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy
+        - arn:aws:iam::aws:policy/ElasticLoadBalancingFullAccess
+        - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly
+        - arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy
+      withAddonPolicies:
+        autoScaler: true
+        externalDNS: true
+        certManager: true
+        ebs: true
+        efs: true
+        albIngress: true
+        cloudWatch: true
+     
+iam:
+  withOIDC: true 
