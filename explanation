@@ -179,7 +179,7 @@ helm pull eks/aws-load-balancer-controller
 * cluster name
 * region
 * vpcid
-* defaulTargetGroup ip
+* defaulTargetType ip
 * createIngressClassResource true
 * Serviceaccount false
 NOTE: Refer the values file in the aws-load-balancer-controller directory  
